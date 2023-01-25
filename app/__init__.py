@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_cors import CORS
+
 
 api = Flask(__name__)
 
@@ -13,6 +15,7 @@ db = SQLAlchemy(api)
 ma = Marshmallow(api)
 
 
+CORS(api, resources={r"*": {"origins": "*"}})
 
 
 from . import routes
