@@ -92,30 +92,32 @@ def get_users():
 
 # check in route 
 @api.route('/attendance/checkin', methods=['POST'])
-@jwt_required
 def checkin():
     # Get the user_id from the request
     user_id = request.json['user_id']
     user = User.query.get(user_id)
     if user is None:
         return jsonify({"error": "User not found"}), 404
-    
+
     # Get the last attendance of the user
     last_attendance = Attendance.query.filter_by(user_id=user_id).order_by(Attendance.check_in_time.desc()).first()
     
     # check if the last attendance is from today
-    if last_attendance and last_attendance.check_in_time.date() == datetime.utcnow().date():
-        return jsonify({"error": "You have already checked in today"}), 400
+    if last_attendance is not None and last_attendance.check_out_time is None and last_attendance.check_in_time.date() == datetime.utcnow().date():
+        return jsonify({"error": "You have not checked out today or you have already checked in"}), 400
     
     # Create a new Attendance object
     attendance = Attendance(user_id=user_id, check_in_time=datetime.utcnow())
+    db.session.add(attendance)
+    db.session.commit()
+    return jsonify(attendance_schema.dump(attendance)),
+
 
 
 
 
 # check out route 
 @api.route('/attendance/checkout', methods=['POST'])
-@jwt_required
 def checkout():
     # Get the user_id from the request
     user_id = request.json['user_id']
@@ -133,3 +135,31 @@ def checkout():
     last_attendance.check_out_time = datetime.utcnow()
     db.session.commit()
     return jsonify(attendance_schema.dump(last_attendance)), 201
+
+
+
+@api.route('/attendance', methods=['GET'])
+def get_attendance():
+    attendance_list = []
+    attendance = Attendance.query.all()
+    for a in attendance:
+        check_in_day = a.check_in_time.strftime("%d")
+        check_in_month = a.check_in_time.strftime("%m")
+        check_in_year = a.check_in_time.strftime("%Y")
+        check_in_time = a.check_in_time.strftime("%H:%M:%S")
+        check_out_day = a.check_out_time.strftime("%d") if a.check_out_time else ''
+        check_out_month = a.check_out_time.strftime("%m") if a.check_out_time else ''
+        check_out_year = a.check_out_time.strftime("%Y") if a.check_out_time else ''
+        check_out_time = a.check_out_time.strftime("%H:%M:%S") if a.check_out_time else ''
+        attendance_list.append({
+            'user_id': a.user_id,
+            'check_in_day': check_in_day,
+            'check_in_month': check_in_month,
+            'check_in_year': check_in_year,
+            'check_in_time': check_in_time,
+            'check_out_day': check_out_day,
+            'check_out_month': check_out_month,
+            'check_out_year': check_out_year,
+            'check_out_time': check_out_time
+        })
+    return jsonify(attendance_list)

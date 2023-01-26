@@ -15,7 +15,7 @@ db = SQLAlchemy(api)
 ma = Marshmallow(api)
 
 
-CORS(api, resources={r"*": {"origins": "*"}})
-
-
 from . import routes
+
+
+CORS(api, resources={r"*": {"origins": "*"}})
