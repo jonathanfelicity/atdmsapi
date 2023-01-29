@@ -1,7 +1,9 @@
 import jwt
+import os
+from random import choice
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import jsonify, request
+from flask import jsonify, request, send_file, url_for
 from . import api, db
 from .models import User, Attendance
 
@@ -137,6 +139,28 @@ def checkout():
     return jsonify(attendance_schema.dump(last_attendance)), 201
 
 
+# ACTIVE USERS
+@api.route('/users/checkedin')
+def users_checked_in():
+    today = datetime.utcnow().date()
+    checked_in_users = User.query.join(Attendance).filter(
+        Attendance.check_in_time.between(datetime.combine(today, datetime.min.time()), datetime.utcnow()),
+        Attendance.check_out_time == None
+    ).all()
+
+    return jsonify([user.to_dict() for user in checked_in_users])
+
+# OFFLINE USERS
+@api.route('/users/checkedout')
+def users_checked_out():
+    today = datetime.utcnow().date()
+    checked_out_users = User.query.join(Attendance).filter(
+        Attendance.check_out_time.between(datetime.combine(today, datetime.min.time()), datetime.combine(today, datetime.max.time()))
+    ).all()
+
+    return jsonify([user.to_dict() for user in checked_out_users])
+
+
 
 @api.route('/attendance', methods=['GET'])
 def get_attendance():
@@ -163,3 +187,8 @@ def get_attendance():
             'check_out_time': check_out_time
         })
     return jsonify(attendance_list)
+
+
+
+
+

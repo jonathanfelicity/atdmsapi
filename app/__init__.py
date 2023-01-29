@@ -1,10 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from flask_cors import CORS
+# from flask_cors import CORS
 
 
-api = Flask(__name__)
+api = Flask(__name__, static_folder='static')
 
 api.app_context().push()
 api.config['SECRET_KEY']= 'f0fc14b08995b4cbd607ed82031ed0839214f47d6750c73ebd4d0b0422093a8ef3f724'
@@ -18,4 +18,4 @@ ma = Marshmallow(api)
 from . import routes
 
 
-CORS(api, resources={r"*": {"origins": "*"}})
+# CORS(api, resources={r"*": {"origins": "*"}})
