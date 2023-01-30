@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+
+
+{% block content %}
+<div class="main-content">
+
+    <div class="page-content">
+        <div class="container-fluid">
+
+            <!-- start page title -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-title-box d-flex align-items-center justify-content-between">
+                        <h4 class="mb-0 font-size-18">Dashboard</h4>
+
+                        <div class="page-title-right">
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item"><a href="javascript: void(0);">Opatix</a></li>
+                                <li class="breadcrumb-item active">Dashboard</li>
+                            </ol>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- end page title -->
+
+            <div class="row">
+                <div class="col-xl-4 col-md-6">
+                    <div class="card card-animate">
+                        <div class="card-body">
+                            <div class="avatar-sm float-right">
+                                <span class="avatar-title bg-soft-primary rounded-circle">
+                                    <i class="bx bx-dollar-circle m-0 h3 text-primary"></i>
+                                </span>
+                            </div>
+                            <h6 class="text-muted text-uppercase mt-0">Total Users</h6>
+                            <h3 class="my-3">{{ all_users }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-6">
+                    <div class="card card-animate">
+                        <div class="card-body">
+                            <div class="avatar-sm float-right">
+                                <span class="avatar-title bg-soft-primary rounded-circle">
+                                    <i class="bx bx-dollar-circle m-0 h3 text-primary"></i>
+                                </span>
+                            </div>
+                            <h6 class="text-muted text-uppercase mt-0">Total Attendance record</h6>
+                            <h3 class="my-3">{{ all_attendance }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-6">
+                    <div class="card card-animate">
+                        <div class="card-body">
+                            <div class="avatar-sm float-right">
+                                <span class="avatar-title bg-soft-primary rounded-circle">
+                                    <i class="bx bx-analyse m-0 h3 text-primary"></i>
+                                </span>
+                            </div>
+                            <h6 class="text-muted text-uppercase mt-0">Checkin users today</h6>
+                            <h3 class="my-3"><span data-plugin="counterup">{{checkin_users }}</span></h3>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+            <!-- end row -->
+
+            
+
+            <!-- end row-->
+
+        </div> <!-- container-fluid -->
+    </div>
+    <!-- End Page-content -->
+
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    2023 project.
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-right d-none d-sm-block">
+                        Design and developed by Gombe State University Student
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</div>
+{% endblock content %}

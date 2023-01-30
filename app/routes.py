@@ -205,6 +205,59 @@ def _index():
 
 
 #ADMIN DASHBOARD
-@api.route('/dashboard'):
+@api.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+     # all users 
+    all_users = User.query.count()
+    # all attendance
+    all_attendance = Attendance.query.count()
+    # check in users for today
+    today = datetime.utcnow().date()
+    attendances = Attendance.query.filter(db.func.date(Attendance.check_in_time) == today).all()
+    user_ids = [attendance.user_id for attendance in attendances]
+    checkin_users = len(set(user_ids))
+    return render_template('dashboard.html', all_users=all_users, all_attendance=all_attendance, checkin_users=checkin_users)
+   
+
+
+
+#ADMIN USERATTENDANCE
+@api.route('/users')
+def users():
+    return render_template('attendance.html')
+
+
+#ADMIN USERATTENDANCE
+@api.route('/attendance')
+def attendance():
+    attendances = Attendance.query.join(User).add_columns(
+        User.name.label('user_name'),
+        Attendance.check_in_time,
+        Attendance.check_out_time
+    ).all()
+
+    attendance_list = []
+    for attendance in attendances:
+        check_in_day = attendance.check_in_time.strftime('%d')
+        check_in_month = attendance.check_in_time.strftime('%m')
+        check_in_year = attendance.check_in_time.strftime('%Y')
+        check_in_time = attendance.check_in_time.strftime('%H:%M:%S')
+
+        check_out_day = attendance.check_out_time.strftime('%d') if attendance.check_out_time else "not found"
+        check_out_month = attendance.check_out_time.strftime('%m') if attendance.check_out_time else "not found"
+        check_out_year = attendance.check_out_time.strftime('%Y') if attendance.check_out_time else "not found"
+        check_out_time = attendance.check_out_time.strftime('%H:%M:%S') if attendance.check_out_time else "not found"
+
+        attendance_list.append({
+            'user_name': attendance.user_name,
+            'check_in_day': check_in_day,
+            'check_in_month': check_in_month,
+            'check_in_year': check_in_year,
+            'check_in_time': check_in_time,
+            'check_out_day': check_out_day,
+            'check_out_month': check_out_month,
+            'check_out_year': check_out_year,
+            'check_out_time': check_out_time
+        })
+
+    return render_template('attendance.html', attendances=attendance_list)
