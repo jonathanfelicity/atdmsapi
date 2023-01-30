@@ -28,7 +28,7 @@
                         <div class="card-body">
 
                             <h4 class="card-title">Attendace Sheet</h4>
-
+                            <a href="{{ url_for('download_attendance') }}" class="btn btn-success waves-effect waves-light">Download PDF</a>
                             <table id="datatable-buttons" class="table table-striped dt-responsive nowrap">
                                 <thead>
                                     <tr>
@@ -52,6 +52,9 @@
                                     
                                 </tbody>
                             </table>
+
+
+                            
                             
                         </div> <!-- end card body-->
                     </div> <!-- end card -->

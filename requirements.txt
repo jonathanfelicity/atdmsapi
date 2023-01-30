@@ -10,7 +10,9 @@ MarkupSafe==2.1.2
 marshmallow==3.19.0
 marshmallow-sqlalchemy==0.28.1
 packaging==23.0
+Pillow==9.4.0
 PyJWT==2.6.0
+reportlab==3.6.12
 six==1.16.0
 SQLAlchemy==1.4.46
 Werkzeug==2.2.2
@@ -26,7 +28,9 @@ MarkupSafe==2.1.2
 marshmallow==3.19.0
 marshmallow-sqlalchemy==0.28.1
 packaging==23.0
+Pillow==9.4.0
 PyJWT==2.6.0
+reportlab==3.6.12
 six==1.16.0
 SQLAlchemy==1.4.46
 Werkzeug==2.2.2

@@ -1,15 +1,41 @@
 import jwt
 import os
+from reportlab.pdfgen import canvas
+from io import BytesIO
 from random import choice
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import jsonify, request, send_file, url_for, render_template, redirect
+from flask import jsonify, request, send_file, url_for, render_template, redirect, make_response
 from . import api, db
 from .models import User, Attendance
 
 from .schema import user_schema, users_schema, attendance_schema, attendances_schema
 from .constants import BASE_URI
 
+
+
+def generate_pdf(attendances):
+    response = make_response(content_type='application/pdf')
+    response.headers['Content-Disposition'] = 'attachment; filename=attendances.pdf'
+
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer)
+
+    for attendance in attendances:
+        # Add logic to extract the required information from each attendance object
+        user_name = attendance.user.name
+        check_in_time = attendance.check_in_time.strftime('%Y-%m-%d %H:%M:%S')
+        check_out_time = attendance.check_out_time.strftime('%Y-%m-%d %H:%M:%S') if attendance.check_out_time else None
+
+        # Add logic to create the PDF document and add the attendance information to it
+        pdf.drawString(100, 100, 'User Name: ' + user_name)
+        pdf.drawString(100, 80, 'Check-in Time: ' + str(check_in_time))
+        pdf.drawString(100, 60, 'Check-out Time: ' + str(check_out_time))
+
+    pdf.save()
+    buffer.seek(0)
+
+    return response.data(buffer.read())
 
 
 def jwt_required(f):
@@ -61,9 +87,6 @@ def create_user():
 
 
 # authenticate user
-
-
-
 SECRET_KEY = 'mysecretkey'
 
 @api.route(f'/{BASE_URI}/authenticate/user', methods=['POST'])
@@ -78,7 +101,7 @@ def authenticate():
         return jsonify({"error": "Invalid email or password"}), 401
     # create a JSON Web Token
     token = jwt.encode({'user_id': user.id, 'exp':datetime.utcnow() + timedelta(minutes=30)}, SECRET_KEY)
-    return jsonify({'token': token}), 200
+    return jsonify({'token': token, 'user_id': user.id}), 200
 
 
 
@@ -261,3 +284,42 @@ def attendance():
         })
 
     return render_template('attendance.html', attendances=attendance_list)
+
+# DWONLOAD 
+@api.route('/download_attendance')
+def download_attendance():
+    attendances = Attendance.query.all()
+    attendance_list = []
+
+    for attendance in attendances:
+        user = User.query.filter_by(id=attendance.user_id).first()
+
+        check_in_day = attendance.check_in_time.strftime('%d')
+        check_in_month = attendance.check_in_time.strftime('%m')
+        check_in_year = attendance.check_in_time.strftime('%Y')
+        check_in_time = attendance.check_in_time.strftime('%H:%M:%S')
+
+        check_out_day = attendance.check_out_time.strftime('%d') if attendance.check_out_time else None
+        check_out_month = attendance.check_out_time.strftime('%m') if attendance.check_out_time else None
+        check_out_year = attendance.check_out_time.strftime('%Y') if attendance.check_out_time else None
+        check_out_time = attendance.check_out_time.strftime('%H:%M:%S') if attendance.check_out_time else None
+
+        attendance_list.append({
+            'user_name': user.name,
+            'check_in_day': check_in_day,
+            'check_in_month': check_in_month,
+            'check_in_year': check_in_year,
+            'check_in_time': check_in_time,
+            'check_out_day': check_out_day,
+            'check_out_month': check_out_month,
+            'check_out_year': check_out_year,
+            'check_out_time': check_out_time
+        })
+
+    pdf = generate_pdf(attendance_list)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=attendance.pdf'
+    return response
+
+    return response
