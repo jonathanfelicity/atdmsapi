@@ -3,7 +3,7 @@ import os
 from random import choice
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import jsonify, request, send_file, url_for
+from flask import jsonify, request, send_file, url_for, render_template, redirect
 from . import api, db
 from .models import User, Attendance
 
@@ -34,7 +34,7 @@ def jwt_required(f):
 
 
 # create new user
-@api.route('/create/user', methods=['POST'])
+@api.route(f'/{BASE_URI}/create/user', methods=['POST'])
 def create_user():
     data = request.get_json()
     name = data.get('name')
@@ -66,7 +66,7 @@ def create_user():
 
 SECRET_KEY = 'mysecretkey'
 
-@api.route('/authenticate/user', methods=['POST'])
+@api.route(f'/{BASE_URI}/authenticate/user', methods=['POST'])
 def authenticate():
     try:
         email = request.json['email']
@@ -83,7 +83,7 @@ def authenticate():
 
 
 # get all users
-@api.route('/users', methods=['GET'])
+@api.route(f'/{BASE_URI}/users', methods=['GET'])
 # @jwt_required
 def get_users():
     users = User.query.all()
@@ -93,7 +93,7 @@ def get_users():
     
 
 # check in route 
-@api.route('/attendance/checkin', methods=['POST'])
+@api.route(f'/{BASE_URI}/attendance/checkin', methods=['POST'])
 def checkin():
     # Get the user_id from the request
     user_id = request.json['user_id']
@@ -119,7 +119,7 @@ def checkin():
 
 
 # check out route 
-@api.route('/attendance/checkout', methods=['POST'])
+@api.route(f'/{BASE_URI}/attendance/checkout', methods=['POST'])
 def checkout():
     # Get the user_id from the request
     user_id = request.json['user_id']
@@ -140,7 +140,7 @@ def checkout():
 
 
 # ACTIVE USERS
-@api.route('/users/checkedin')
+@api.route(f'/{BASE_URI}/users/checkedin')
 def users_checked_in():
     today = datetime.utcnow().date()
     checked_in_users = User.query.join(Attendance).filter(
@@ -151,7 +151,7 @@ def users_checked_in():
     return jsonify([user.to_dict() for user in checked_in_users])
 
 # OFFLINE USERS
-@api.route('/users/checkedout')
+@api.route(f'/{BASE_URI}/users/checkedout')
 def users_checked_out():
     today = datetime.utcnow().date()
     checked_out_users = User.query.join(Attendance).filter(
@@ -162,7 +162,7 @@ def users_checked_out():
 
 
 
-@api.route('/attendance', methods=['GET'])
+@api.route(f'/{BASE_URI}/attendance', methods=['GET'])
 def get_attendance():
     attendance_list = []
     attendance = Attendance.query.all()
@@ -192,3 +192,19 @@ def get_attendance():
 
 
 
+
+# ADMIN LOGIN
+@api.route('/', methods=["POST", "GET"])
+def _index():
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    if email == 'johndoe@fake.com' and password == '123@':
+        return redirect('/dashboard')
+    return render_template('signin.html')
+
+
+#ADMIN DASHBOARD
+@api.route('/dashboard'):
+def dashboard():
+    return render_template('dashboard.html')
