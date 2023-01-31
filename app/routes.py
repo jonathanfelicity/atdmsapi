@@ -247,7 +247,8 @@ def dashboard():
 #ADMIN USERATTENDANCE
 @api.route('/users')
 def users():
-    return render_template('attendance.html')
+    users = User.query.all()
+    return render_template('users.html', users=users)
 
 
 #ADMIN USERATTENDANCE

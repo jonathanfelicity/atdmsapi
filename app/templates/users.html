@@ -33,20 +33,19 @@
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Date</th>
-                                        <th>Checkin Time</th>
-                                        <th>Checkout Time</th>
+                                        <th>Email</th>
+                                        <th>Date Account created</th>
+                                        
                                     </tr>
                                 </thead>
                             
                             
                                 <tbody>
-                                    {% for attendance in attendances %}
+                                    {% for user in users %}
                                     <tr>
-                                        <td>{{ attendance.user_name }}</td>
-                                        <td>{{ attendance.check_in_day }}-{{ attendance.check_in_month }}-{{ attendance.check_in_year }}</td>
-                                        <td>{{ attendance.check_in_time }}</td>
-                                        <td>{% if attendance.check_out_time %}{{ attendance.check_out_time }}{% endif %}</td>
+                                        <td>{{ user.name }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.created_at }}</td>
                                     </tr>
                                     {% endfor %}
                                     
